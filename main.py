@@ -4,6 +4,7 @@ import glob
 import os
 import re
 
+from global_config import get_activation_path
 
 def get_idea_config():
     dirname = os.getcwd()
@@ -18,18 +19,12 @@ def get_idea_config():
 
 def parse_config(filepath):
     row = open(filepath).read()
-    venv_name = re.compile(r'project-jdk-name="Python [\w.]+( virtualenv at)? ([^"]*)')
+    venv_name = re.compile(r'project-jdk-name="([^"]*)"')
     match = venv_name.search(row)
     if not match and not match.groups(0):
         return None
 
-    venv = match.groups()[1]
-
-    if venv.startswith('('):
-        venv = venv[1:-1]
-    venv = os.path.expanduser(venv)
-
-    return '{}/bin/activate'.format(venv)
+    return get_activation_path(match.groups()[0])
 
 
 def main():
